@@ -1,35 +1,33 @@
-package Lab3;
+package Lab4;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.resolution.UnsolvedSymbolException;
-import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.ast.visitor.VoidVisitor;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.model.resolution.TypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
-public class Step3 {
+public class FourArgumentsSolver {
 
-	public static void main(String[] args) {
-		File file = new File("src/main/resources/source-code/Astar");
-		
+	public static void search(String filePath) {
+//		File file = new File(filePath);
+		File file = new File("src/main/resources/source-code/jhotdraw/JHotDraw7/src/main/java");
+
 		TypeSolver javaParserTypeSolver = new JavaParserTypeSolver(file);
-		
+
 		CombinedTypeSolver combinedSolver = new CombinedTypeSolver();
 		combinedSolver.add(new ReflectionTypeSolver());
 		combinedSolver.add(javaParserTypeSolver);
-		
+
 		try {
 			listFilesForFolder(file, combinedSolver);
 		} catch (IOException e) {
@@ -37,7 +35,7 @@ public class Step3 {
 		}
 
 	}
-	
+
 	public static void listFilesForFolder(File folder, CombinedTypeSolver combinedSolver) throws IOException {
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isDirectory()) {
@@ -54,32 +52,22 @@ public class Step3 {
 	public static void recursiveFunc(File file, TypeSolver typeSolver) throws FileNotFoundException {
 		JavaSymbolSolver symbolSolver = new JavaSymbolSolver(typeSolver);
 		StaticJavaParser.getConfiguration().setSymbolResolver(symbolSolver);
-		
+
 		CompilationUnit cu = StaticJavaParser.parse(file);
-		List<MethodCallExpr> methodCalls = new ArrayList<MethodCallExpr>();
-		methodCalls = cu.findAll(MethodCallExpr.class);
 		
-		methodCalls.forEach(methodCall -> {
-			try {
-				ResolvedType resolvedType = methodCall.resolve().getReturnType();
-				
-				String methodeCallee = methodCall.resolve().getClassName();
-				System.out.println(methodCall.findAncestor(MethodDeclaration.class).get().getName() + " in Class: "
-						+ methodCall.findAncestor(ClassOrInterfaceDeclaration.class).get().getName());
-				System.out.println("Calls");
-				System.out.println(methodCall.toString() + " Type is: " + resolvedType.describe() + " in Class: "
-						+ methodeCallee);
-				System.out.println("**********");
-				
-				//For printing CSV
-//				System.out.println(methodCall.findAncestor(MethodDeclaration.class).get().getName() + " ; "
-//						+ methodCall.getName());
-				
-			} catch (UnsolvedSymbolException e) {
-				System.out.println("UnsolvedSymbolException " + methodCall.toString() + " in file: " + file.getName());
-			}
-		});
-		
+		VoidVisitor<?> tryStatementVisitor = new TryStatementVisitor();
+		tryStatementVisitor.visit(cu, null);
+	}
+	
+	
+	static class TryStatementVisitor extends VoidVisitorAdapter<Void> {
+		public void visit(ClassOrInterfaceDeclaration dec, Void arg) {
+			super.visit(dec, arg);
+			
+			if(dec.findAll(MethodDeclaration.class).stream().anyMatch(method -> method.getParameters().size() > 4)) {
+				System.out.println(dec.getNameAsString());
+			}	
+		}
 	}
 
 }
