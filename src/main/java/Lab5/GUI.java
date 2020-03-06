@@ -24,9 +24,6 @@ public class GUI {
 	static JLabel publicFieldsLabel = new JLabel("Instantiated classes with public fields");
 	static JCheckBox publicFieldsCheckbox = new JCheckBox("");
 	
-//	static JLabel tryNoCatchLabel = new JLabel("Try block no catch or returns null");
-//	static JCheckBox tryNoCatchCheckbox = new JCheckBox("");
-	
 	static JFileChooser fileChooser = new JFileChooser();
 	static String folderOrFileAddress;
 	
@@ -57,10 +54,6 @@ public class GUI {
 		publicFieldsCheckbox.setBounds(100, 70, 20, 20);
 		panel.add(publicFieldsCheckbox);
 		
-//		tryNoCatchLabel.setBounds(130, 100, 300, 20);
-//		panel.add(tryNoCatchLabel);
-//		tryNoCatchCheckbox.setBounds(100, 100, 20, 20);
-//		panel.add(tryNoCatchCheckbox);
 		
 		ui.setVisible(true);
 		
@@ -71,7 +64,7 @@ public class GUI {
 				
 				if (selected == JFileChooser.APPROVE_OPTION) {
 					folderOrFileAddress = fileChooser.getSelectedFile().getAbsolutePath();
-					System.out.println(folderOrFileAddress);
+					System.out.println("Selected folder: " + folderOrFileAddress);
 					
 					if(caseCheckbox.isSelected()) {
 						CamelSnakeCase.search(folderOrFileAddress);
@@ -82,9 +75,6 @@ public class GUI {
 					if(publicFieldsCheckbox.isSelected()) {
 						InstantiaedPublicFields.search(folderOrFileAddress);
 					}
-//					if(tryNoCatchCheckbox.isSelected()) {
-//						TryBlockNoCatchOrNull.search(folderOrFileAddress);
-//					}
 				}
 			}
 		});

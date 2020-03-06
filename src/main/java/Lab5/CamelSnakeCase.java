@@ -92,7 +92,6 @@ public class CamelSnakeCase {
 	}
 	
 	static void nameCheck(String name) {
-		System.out.println("Chaecked: " + name);
 		String camelPattern = "(^[a-z])([a-z]|[A-Z0-9])*";
 		String snakePattern = "(^[a-z])([a-z]|[-])*";
 		
